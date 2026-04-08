@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+import uproot
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+from ROOT import TCanvas, TPad, gStyle
+
+def plotElement(element):
+    fig, ax = plt.subplots(figsize=(8, 5))
+    histogram = root_file[element]["GammaZ"].to_hist()
+    w, x, y = histogram.to_numpy()
+    mesh = ax.pcolormesh(x, y, w.T, cmap="jet", norm=colors.LogNorm(vmin=w[np.nonzero(w)].min(), vmax=w.max()), linewidth=0,rasterized=True)
+    ax.set_xlabel(r"Proton energy $E_p$ (MeV)")
+    ax.set_ylabel("Prompt-gamma energy $E_{PG}$ (MeV)")
+    ax.set_title(element+r" — $\mathbf{\Gamma}_Z\left(E_p\right)$")
+    fig.colorbar(mesh)
+    plt.savefig(element+".pdf", bbox_inches='tight')
+    plt.show()
+
+# Load ROOT TH2D file
+root_file = uproot.open("test.root")
+print(root_file.keys())
+
+elements=["Carbon","Oxygen","Calcium"]
+
+for element in elements:
+    plotElement(element)
