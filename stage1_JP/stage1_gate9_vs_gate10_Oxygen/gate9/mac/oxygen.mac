@@ -1,0 +1,125 @@
+
+
+
+
+#=======================================================================
+# Ce code sert de validation de stage 1 que Violette avait fait en Gate 10
+# Autrement je fais la simu dans Gate 9 comme dans Gate 10 dans les même
+# Condition pour comparer les resulats. j'utilise la base de donnée 
+# db-Oxygen_merged.root, Simu de proton sur boite de Oxygen non voxélisé
+#=======================================================================
+
+
+
+/gate/geometry/setMaterialDatabase data/GateMaterials.db
+
+#=====================================================
+# GEOMETRY 
+#=====================================================
+
+# WORLD
+/gate/world/setMaterial G4_Galactic
+/gate/world/geometry/setXLength 3 m
+/gate/world/geometry/setYLength 3 m
+/gate/world/geometry/setZLength 3 m
+
+# OXYGEN BOX
+/gate/world/daughters/name  oxygenbox
+/gate/world/daughters/insert  box
+/gate/oxygenbox/geometry/setXLength 	40 mm
+/gate/oxygenbox/geometry/setYLength 	150 mm
+/gate/oxygenbox/geometry/setZLength 	40 mm
+/gate/oxygenbox/placement/setTranslation 0 0 0 mm
+/gate/oxygenbox/setMaterial Oxygen
+
+#=====================================================
+# PHYSICS
+#=====================================================
+
+/gate/physics/addPhysicsList QGSP_BIC_HP_EMY
+
+/gate/physics/Gamma/SetCutInRegion      world 0.1 mm
+/gate/physics/Electron/SetCutInRegion   world 0.1 mm
+/gate/physics/Proton/SetCutInRegion     world 0.1 mm
+/gate/physics/Positron/SetCutInRegion   world 0.1 mm
+
+
+/gate/physics/Gamma/SetCutInRegion      oxygenbox 0.1 mm
+/gate/physics/Electron/SetCutInRegion   oxygenbox 0.1 mm
+/gate/physics/Proton/SetCutInRegion     oxygenbox 0.1 mm
+/gate/physics/Positron/SetCutInRegion   oxygenbox 0.1 mm
+
+/gate/physics/SetMaxStepSizeInRegion oxygenbox 0.1 mm
+/gate/physics/ActivateStepLimiter proton
+
+#=====================================================
+# ACTORS
+#=====================================================
+
+# Ici j'utilise la base d Oxygen_merged.root
+/gate/actor/addActor PromptGammaTLEActor pgtle
+/gate/actor/pgtle/attachTo oxygenbox
+/gate/actor/pgtle/setInputDataFile data/db-Oxygen_merged.root
+/gate/actor/pgtle/setVoxelSize     	40 150 40 mm
+/gate/actor/pgtle/setPosition      	0 0 0 mm
+
+/gate/actor/pgtle/setSize          	40 150 40 mm
+
+/gate/actor/pgtle/enableDebugOutput false
+/gate/actor/pgtle/save output/source_vpg_Oxygen.mhd
+
+
+# ----------------------------------------------------
+# Statistics Actor
+# ----------------------------------------------------
+/gate/actor/addActor               SimulationStatisticActor stat
+/gate/actor/stat/save              output/stat_vpg_Oxygen.txt
+
+
+#=====================================================
+# INITIALISATION
+#=====================================================
+
+/gate/run/initialize
+
+#=====================================================
+# VISUALISATION
+#=====================================================
+
+#/control/execute mac/visu.mac
+
+
+#=====================================================
+# SOURCE
+#=====================================================
+
+/gate/source/addSource mybeam gps
+/gate/source/mybeam/gps/particle proton
+/gate/source/mybeam/gps/ene/type Mono
+/gate/source/mybeam/gps/ene/mono 200 MeV
+/gate/source/mybeam/gps/pos/type Beam
+/gate/source/mybeam/gps/pos/shape Circle
+/gate/source/mybeam/gps/pos/sigma_x 0 mm
+/gate/source/mybeam/gps/pos/sigma_y 0 mm
+/gate/source/mybeam/gps/ang/type iso
+/gate/source/mybeam/gps/ang/sigma_x 0.00 rad
+/gate/source/mybeam/gps/ang/sigma_y 0.00 rad
+/gate/source/mybeam/gps/pos/centre 0 -300 0 mm
+/gate/source/mybeam/gps/direction 0 1 0
+/gate/source/mybeam/gps/time 0 ns
+
+
+
+
+#=====================================================
+# START BEAMS
+#=====================================================
+
+/gate/application/noGlobalOutput
+/gate/run/enableGlobalOutput false
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed auto
+/gate/application/setTotalNumberOfPrimaries  1e6
+/gate/application/start
+
