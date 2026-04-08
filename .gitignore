@@ -1,0 +1,9 @@
+
+*.root
+*.nii.gz
+**/build/**
+*.png
+**/__pycache__/**
+
+
+
