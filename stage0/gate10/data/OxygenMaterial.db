@@ -1,3 +1,0 @@
-[Materials]
-Oxygen: d=1.0 g/cm3; n=1; state=Solid
-    +el: name=O; n=1
