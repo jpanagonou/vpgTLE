@@ -1,0 +1,92 @@
+Ici les A^{1/3} normalisé en utilisant les masses molaires qu'on a passé à Gate dans 
+le fichier GateMaterials.db. Les A dans GateMaterials.db sont pondérés par l'abondance naturelle des isotopes de chaque élément. 
+C'est la masse atomique standard, moyenne pondérée de tous les isotopes naturels.
+
+AllElements2: d=1.0 g/cm3; n=2; state=Solid
++el: name=Oxygen      ; f=0.5238858952407169
++el: name=Carbon      ; f=0.4761141047592830
+
+AllElements3: d=1.0 g/cm3; n=5; state=Solid
++el: name=Oxygen      ; f=0.2707013678876229
++el: name=Carbon      ; f=0.2460168151114442
++el: name=Hydrogen    ; f=0.1077848150126705
++el: name=Helium      ; f=0.1705737979586709
++el: name=Lithium     ; f=0.2049232040295915
+
+AllElements4: d=1.0 g/cm3; n=10; state=Solid
++el: name=Oxygen      ; f=0.1177369462011731
++el: name=Carbon      ; f=0.1070008206880746
++el: name=Hydrogen    ; f=0.0468791682342674
++el: name=Helium      ; f=0.0741881662080365
++el: name=Lithium     ; f=0.0891278549365142
++el: name=Beryllium   ; f=0.0972328839577161
++el: name=Boron       ; f=0.1033145278623951
++el: name=Nitrogen    ; f=0.1126381437182828
++el: name=Fluorine    ; f=0.1246738585359084
++el: name=Neon        ; f=0.1272076296576318
+
+AllElements5: d=1.0 g/cm3; n=15; state=Solid
++el: name=Oxygen      ; f=0.0693752981769286
++el: name=Carbon      ; f=0.0630491454035801
++el: name=Hydrogen    ; f=0.0276230731259301
++el: name=Helium      ; f=0.0437146224523937
++el: name=Lithium     ; f=0.0525176821006175
++el: name=Beryllium   ; f=0.0572934880240851
++el: name=Boron       ; f=0.0608770348452511
++el: name=Nitrogen    ; f=0.0663708806681598
++el: name=Fluorine    ; f=0.0734628032225171
++el: name=Neon        ; f=0.0749558020878122
++el: name=Sodium      ; f=0.0782848743671426
++el: name=Magnesium   ; f=0.0797498871158773
++el: name=Aluminium   ; f=0.0825744171606997
++el: name=Silicon     ; f=0.0836916470647425
++el: name=Phosphor    ; f=0.0864593441842627
+
+AllElements6: d=1.0 g/cm3; n=20; state=Solid
++el: name=Oxygen      ; f=0.0475274150028906
++el: name=Carbon      ; f=0.0431935137998452
++el: name=Hydrogen    ; f=0.0189239296206423
++el: name=Helium      ; f=0.0299478785329464
++el: name=Lithium     ; f=0.0359786514476705
++el: name=Beryllium   ; f=0.0392504458191921
++el: name=Boron       ; f=0.0417054510073138
++el: name=Nitrogen    ; f=0.0454691579354105
++el: name=Fluorine    ; f=0.0503276703348771
++el: name=Neon        ; f=0.0513504893862454
++el: name=Sodium      ; f=0.0536311599412150
++el: name=Magnesium   ; f=0.0546348063502879
++el: name=Aluminium   ; f=0.0565698266695671
++el: name=Silicon     ; f=0.0573352150815587
++el: name=Phosphor    ; f=0.0592313004759057
++el: name=Sulfur      ; f=0.0599219303821312
++el: name=Chlorine    ; f=0.0619597437258353
++el: name=Argon       ; f=0.0644777381434128
++el: name=Potassium   ; f=0.0640160756182466
++el: name=Calcium     ; f=0.0645476007248056
+
+AllElements7: d=1.0 g/cm3; n=25; state=Solid
++el: name=Oxygen      ; f=0.0338959352822926
++el: name=Carbon      ; f=0.0308050532158191
++el: name=Hydrogen    ; f=0.0134963008964182
++el: name=Helium      ; f=0.0213584381253004
++el: name=Lithium     ; f=0.0256595070642961
++el: name=Beryllium   ; f=0.0279929083289624
++el: name=Boron       ; f=0.0297437861532498
++el: name=Nitrogen    ; f=0.0324280130662540
++el: name=Fluorine    ; f=0.0358930410264433
++el: name=Neon        ; f=0.0366225022935577
++el: name=Sodium      ; f=0.0382490469210485
++el: name=Magnesium   ; f=0.0389648345086161
++el: name=Aluminium   ; f=0.0403448658759483
++el: name=Silicon     ; f=0.0408907309535484
++el: name=Phosphor    ; f=0.0422429944379516
++el: name=Sulfur      ; f=0.0427355427199066
++el: name=Chlorine    ; f=0.0441888847375902
++el: name=Argon       ; f=0.0459846856624710
++el: name=Potassium   ; f=0.0456554339437662
++el: name=Calcium     ; f=0.0460345107484219
++el: name=Titanium    ; f=0.0488412043083685
++el: name=Copper      ; f=0.0536349497613494
++el: name=Zinc        ; f=0.0541931930169159
++el: name=Silver      ; f=0.0640331946774320
++el: name=Tin         ; f=0.0661104422740718
