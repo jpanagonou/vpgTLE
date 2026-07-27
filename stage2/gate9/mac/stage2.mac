@@ -1,0 +1,94 @@
+# ============================================================
+# Comparaison Gate 9 / Gate 10 - cote Gate 9
+# Source PG voxelisee (PGS), detecteur spherique 1m
+# ============================================================
+
+
+/control/verbose 0
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+
+
+# ----------------------------------------------------
+# World
+# ----------------------------------------------------
+/gate/world/setMaterial G4_AIR
+/gate/world/geometry/setXLength 3 m
+/gate/world/geometry/setYLength 3 m
+/gate/world/geometry/setZLength 3 m
+/gate/world/vis/setVisible 0
+
+
+# ----------------------------------------------------
+# Material database
+# ----------------------------------------------------
+/gate/geometry/setMaterialDatabase    data/GateMaterials.db
+
+
+# ----------------------------------------------------
+# Detecteur spherique de 1m, coquille fine
+# ----------------------------------------------------
+/gate/world/daughters/name              detector_sphere
+/gate/world/daughters/insert            sphere
+/gate/detector_sphere/geometry/setRmin  999 mm
+/gate/detector_sphere/geometry/setRmax  1000 mm
+/gate/detector_sphere/setMaterial       G4_AIR
+/gate/detector_sphere/vis/setColor      red
+
+
+# ----------------------------------------------------
+# Physics
+# ----------------------------------------------------
+/gate/physics/addPhysicsList QGSP_BERT_EMZ
+
+
+/gate/physics/Gamma/SetCutInRegion      world 1 mm
+/gate/physics/Electron/SetCutInRegion   world 1 mm
+/gate/physics/Positron/SetCutInRegion   world 1 mm
+
+
+# ----------------------------------------------------
+# Acteur statistiques (declare AVANT initialize)
+# ----------------------------------------------------
+/gate/actor/addActor                 SimulationStatisticActor stats
+/gate/actor/stats/save                output/stat_gate9_realimage.txt
+
+
+# ----------------------------------------------------
+# Acteur PhaseSpace (declare AVANT initialize)
+# ----------------------------------------------------
+/gate/actor/addActor                 PhaseSpaceActor phsp
+/gate/actor/phsp/attachTo             detector_sphere
+/gate/actor/phsp/save                 output/gate9_realimage_phsp.root
+/gate/actor/phsp/enableEkine          true
+/gate/actor/phsp/enableXPosition      true
+/gate/actor/phsp/enableYPosition      true
+/gate/actor/phsp/enableZPosition      true
+/gate/actor/phsp/enableParticleName   true
+/gate/actor/phsp/storeSecondaries     false
+
+
+# ----------------------------------------------------
+# Initialisation
+# ----------------------------------------------------
+/gate/run/initialize
+
+
+# ----------------------------------------------------
+# Source PG voxelisee (declaree APRES initialize)
+# ----------------------------------------------------
+/gate/source/addSource PGS SourceOfPromptGamma
+/gate/source/PGS/setFilename data/vpg_gate9.mhd
+/gate/source/PGS/setTof true
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed 123456
+
+
+
+# ----------------------------------------------------
+# Run
+# ----------------------------------------------------
+/gate/application/setTotalNumberOfPrimaries 1e5
+/gate/application/start
