@@ -80,7 +80,7 @@
 # ----------------------------------------------------
 /gate/source/addSource PGS SourceOfPromptGamma
 /gate/source/PGS/setFilename data/vpg_gate9.mhd
-/gate/source/PGS/setTof true
+/gate/source/PGS/setTof false
 
 /gate/random/setEngineName MersenneTwister
 /gate/random/setEngineSeed 123456
