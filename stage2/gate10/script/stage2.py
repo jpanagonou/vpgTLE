@@ -17,12 +17,13 @@ global de la source (somme de tous les voxels de l'image), et comparer
 ensuite avec le meme calcul effectue cote Gate 9.
 """
 
-
+import time 
 import numpy as np
 import itk
 import opengate as gate
 from pathlib import Path
 
+t0 = time.time()
 
 if __name__ == "__main__":
     data_dir = Path(__file__).parent.parent / "data"
@@ -111,6 +112,10 @@ if __name__ == "__main__":
 
 
     sim.run()
+    t1 = time.time()
+
+    print(f"\nTEMPS_GATE10 = {t1 - t0:.4f}")
+    
     print(stats)
 
 
