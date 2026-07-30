@@ -12,7 +12,7 @@ Voir [`stage0/README.md`](./stage0/README.md) pour la documentation complète.
 
 Le Stage 1 combine la base de données PGdb (Stage 0) avec la trajectoire des protons simulée dans le volume CT, pour produire, voxel par voxel, le spectre en énergie des prompt-gammas émis (méthode du Track Length Estimator). Il se décompose en un Stage 1a, qui calcule les longueurs de trace par voxel et par énergie, et un Stage 1b, qui convertit ces longueurs de trace en spectres d'émission par convolution avec la base de données PGdb.
 
-Seul le Stage 1b a fait l'objet d'un travail d'optimisation dans ce projet, remplaçant la boucle séquentielle sur les voxels par un regroupement par matériau (`np.dot`), exploitant le fait que le nombre de matériaux distincts dans un CT est très inférieur au nombre de voxels. Ce regroupement apporte un gain de performance croissant avec la résolution du CT (jusqu'à ×7,4 à 4~mm de spacing sur un volume de $104\times104\times152$ voxels), sans introduire de biais numérique sur les spectres produits (écart relatif de l'ordre de $10^{-8}$~%, conforme à la précision machine).
+Seul le Stage 1b a fait l'objet d'un travail d'optimisation dans ce projet, remplaçant la boucle séquentielle sur les voxels par un regroupement par matériau (`np.dot`), exploitant le fait que le nombre de matériaux distincts dans un CT est très inférieur au nombre de voxels. Ce regroupement apporte un gain de performance croissant avec la résolution du CT (jusqu'à ×7,4 à 4~mm de spacing sur un volume de $104\times104\times152$ voxels), sans introduire de biais numérique sur les spectres produits.
 
 Voir [`stage1/README.md`](./stage1/README.md) pour la documentation complète.
 
