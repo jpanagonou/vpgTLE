@@ -1,6 +1,6 @@
 # PromptGammaStatisticActor
 
-Le `PromptGammaStatisticActor` est un acteur basé sur Geant4, implémenté dans Gate 10 pour construire une base de données de prompt-gamma (PGdb) utilisée par le module vpgTLE (variance prompt gamma Track Length Estimator). Il calcule, pour chaque élément chimique de numéro atomique Z, le rendement de prompt-gamma par unité de densité~:
+Le `PromptGammaStatisticActor` est un acteur basé sur Geant4, implémenté dans Gate 10 pour construire une base de données de prompt-gamma (PGdb) utilisée par le module vpgTLE (voxelized prompt gamma Track Length Estimator). Il calcule, pour chaque élément chimique de numéro atomique Z, le rendement de prompt-gamma par unité de densité~:
 
 $$\frac{\Gamma_Z(E)}{\rho_Z} = \frac{N_\gamma(Z,E)}{N_{\rm inel}(Z,E)} \cdot \frac{\kappa_{\rm inel}(Z,E)}{\rho_Z}$$
 
