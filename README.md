@@ -2,7 +2,7 @@
 
 Ce dossier regroupe les trois étapes du portage sous Gate 10 du module vpgTLE (voxelized prompt gamma Track Length Estimator), permettant de simuler l'émission de prompt-gammas en protonthérapie sans avoir à simuler explicitement chaque interaction nucléaire proton-noyau.
 
-## Stage 0 — Construction de la base de données de prompt-gammas
+## Stage 0 - Construction de la base de données de prompt-gammas
 
 Le `PromptGammaStatisticActor` construit, pour chaque élément chimique, le rendement de prompt-gamma par unité de densité en fonction de l'énergie de la particule incidente (proton ou neutron), à partir de simulations sur cibles élémentaires. Cette base de données (PGdb) constitue l'entrée du Stage 1.
 
