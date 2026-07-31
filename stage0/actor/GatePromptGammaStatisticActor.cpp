@@ -18,6 +18,8 @@
 #include "G4PhysicalConstants.hh"
 #include "G4HadronicProcess.hh"
 #include <fstream>
+#include <chrono>
+
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -63,33 +65,31 @@ void GatePromptGammaStatisticActor::InitializeCpp() {
      fSigmaFilled = false;
      fNInelastic.assign(fParticleNbBins, 0.0);
      fDensity = 0.0;
-     fGammaEvents.clear();
-     fEpEpgNormEvents.clear();
+
+
      fEpInelasticProducedGamma.clear();
      fGammaZData.assign(fParticleNbBins,
                         std::vector<G4double>(fGammaNbBins, 0.0));
-     fEpEpgNormData.assign(fParticleNbBins,
-                           std::vector<G4double>(fGammaNbBins, 0.0));
+      fNGammaDetectedMono = 0;
 
    /* This two lignes to do tecking about the filter KE> 0, this is just avilabe for mono mode*/
+   /* 
    fNInelasticPartiel.assign(fParticleNbBins, 0.0); 
    fSecondairePartielCount.clear(); 
    fEnergiesSecondairesPartiel.clear(); 
    fSecondaireTotalCount.clear();
    fEnergiesSecondairesTotal.clear();
-
+      */
 
 
   } else {
      fGammaZDataMap.clear();
-     fEpEpgNormDataMap.clear();
      fNInelasticMap.clear();
      fDensityMap.clear();
-     fGammaEventsMap.clear();
-     fEpEpgNormEventsMap.clear();
      fEpInelasticProducedGammaMap.clear();
      fSigmaFilledMap.clear();
      fZtoSymbol.clear();
+     fNGammaDetectedMap.clear();
   }
 }
 
@@ -103,20 +103,12 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
 
 
 
-   G4String h2Name   = (fParticleType == "neutron") ? "EnEpg"  :
-                    (fParticleType == "helium")   ? "EHeEpg" :
-                    (fParticleType == "carbon")   ? "ECEpg"  :
-                                                    "EpEpg";
+   G4String h2Name   = (fParticleType == "neutron") ? "EnEpg" : "EpEpg";
 
-   G4String axisName = (fParticleType == "neutron") ? "Neutron energy [MeV]" :
-                    (fParticleType == "helium")   ? "Helium energy [MeV]"  :
-                    (fParticleType == "carbon")   ? "Carbon energy [MeV]"  :
-                                                    "Proton energy [MeV]";
+   G4String axisName = (fParticleType == "neutron") ? "Neutron energy [MeV]" : "Proton energy [MeV]";
 
-   G4String h1EpName = (fParticleType == "neutron") ? "En"  :
-                    (fParticleType == "helium")   ? "EHe" :
-                    (fParticleType == "carbon")   ? "EC"  :
-                                                    "Ep";
+   G4String h1EpName = (fParticleType == "neutron") ? "En" : "Ep";
+
 
 
 
@@ -155,13 +147,7 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
         fGammaNbBins,  fGammaMinEnergy  / MeV, fGammaMaxEnergy  / MeV);
 
        
-
-     fH1NrPGMono = analysisManager->CreateH1(
-        elemName + "/NrPG",
-        "Number of prompt gammas per bin;"
-        "Particle energy [MeV];N_{PG}",
-        fParticleNbBins, fParticleMinEnergy / MeV, fParticleMaxEnergy / MeV);
-
+     
      fH1KapaMono = analysisManager->CreateH1(
         elemName + "/Kapa inelastique",
         "Linear attenuation coefficient;"
@@ -190,8 +176,6 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
 
 
      for (auto &row : fGammaZData)
-        std::fill(row.begin(), row.end(), 0.0);
-     for (auto &row : fEpEpgNormData)
         std::fill(row.begin(), row.end(), 0.0);
      fSigmaFilled = false;
 
@@ -229,13 +213,9 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
 
      fGammaZDataMap[Z].assign(fParticleNbBins,
                               std::vector<G4double>(fGammaNbBins, 0.0));
-     fEpEpgNormDataMap[Z].assign(fParticleNbBins,
-                                 std::vector<G4double>(fGammaNbBins, 0.0));
      fNInelasticMap[Z].assign(fParticleNbBins, 0.0);
      fDensityMap[Z]     = 1.0;
      fSigmaFilledMap[Z] = false;
-     fGammaEventsMap[Z].clear();
-     fEpEpgNormEventsMap[Z].clear();
      fEpInelasticProducedGammaMap[Z].clear();
 
      G4Element *elemPtr = G4Element::GetElement(sym, false);
@@ -256,13 +236,7 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
         fGammaNbBins,  fGammaMinEnergy  / MeV, fGammaMaxEnergy  / MeV);
 
    
-
-     fH1NrPGIndex[Z] = analysisManager->CreateH1(
-        elemName + "/NrPG",
-        "Number of prompt gammas per bin;"
-        "Particle energy [MeV];N",
-        fParticleNbBins, fParticleMinEnergy / MeV, fParticleMaxEnergy / MeV);
-
+     
      fH1KapaIndex[Z] = analysisManager->CreateH1(
         elemName + "/Kapa inelastique",
         "Linear attenuation coefficient;"
@@ -296,8 +270,21 @@ void GatePromptGammaStatisticActor::BeginOfRunActionMasterThread(int run_id) {
 // Nothing to do here Initialization is handled int BeginOfRunActionMasterThread
 void GatePromptGammaStatisticActor::BeginOfRunAction(const G4Run *run) {}
 
+
+
+// Pour la mesure de temps global dans stepping action
+struct Timer {
+   std::chrono::high_resolution_clock::time_point t0;
+   double &acc;
+   Timer(double &a) : acc(a), t0(std::chrono::high_resolution_clock::now()) {}
+   ~Timer() { acc += std::chrono::duration<double>(std::chrono::high_resolution_clock::now()-t0).count(); }
+};
+
+
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
+  Timer timer(fTimeTotal);
 
    // Widh of one proton and gamma energy bin, the third is the energy at the center of the first bin of proton
   const G4double dE          = (fParticleMaxEnergy - fParticleMinEnergy) / fParticleNbBins;
@@ -305,14 +292,10 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
   const G4double energyStart = fParticleMinEnergy + 0.5 * dE;
 
 
-  // ───────── Particle type filter, keep only protons and neutrons ────────────────
-  const G4ParticleDefinition *particle = step->GetTrack()->GetParticleDefinition();
-      if (fParticleType == "proton"  && particle != G4Proton::Proton())   return;
-      if (fParticleType == "neutron" && particle != G4Neutron::Neutron())  return;
-      if (fParticleType == "helium"  && particle != G4Alpha::Alpha())      return;
-      if (fParticleType == "carbon"  && 
-             !(particle->GetAtomicMass()   == 12 && 
-              particle->GetAtomicNumber() == 6))                          return;
+  // ───────── suit uniquement la particule primaire ────────────────
+  if (step->GetTrack()->GetTrackID() != 1) return;
+   const G4ParticleDefinition *particle = step->GetTrack()->GetParticleDefinition();
+
 
 
    // -----------Kinetic energy at the center of the step ----------------
@@ -331,16 +314,9 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
     store->FindProcess(G4Proton::Proton(),   fHadronInelastic);
   static G4VProcess *neutronInelastic =
     store->FindProcess(G4Neutron::Neutron(), fHadronInelastic);
-  static G4VProcess *heliumInelastic  =
-    store->FindProcess(G4Alpha::Alpha(),     fHadronInelastic);
-  static G4VProcess *carbonInelastic  =
-    store->FindProcess(G4IonTable::GetIonTable()->GetIon(6, 12, 0), fHadronInelastic);
+  
+   G4VProcess *inelasticProcess = (fParticleType == "neutron") ? neutronInelastic : protonInelastic; 
 
-   G4VProcess *inelasticProcess =
-      (fParticleType == "neutron") ? neutronInelastic :
-      (fParticleType == "helium")  ? heliumInelastic  :
-      (fParticleType == "carbon")  ? carbonInelastic  :
-                                   protonInelastic;
 
 
   auto analysisManager = G4AnalysisManager::Instance();
@@ -350,23 +326,25 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
   // ════════════════════════════════════════════════════════════════════════
   if (!fMultiElement) {
 
-     // ── Fill Ep histogram before inelastic filter ────────────────
-     analysisManager->FillH1(fH1EpMono, particle_energy / MeV, 1.0);
-
      // ── Inelastic filter : keep only inelastic interaction───────────
      if (process != inelasticProcess) return;
+
+     // ── Fill Ep histogram before inelastic filter ────────────────
+     analysisManager->FillH1(fH1EpMono, particle_energy / MeV, 1.0);
 
      // --- Read the material density once at the first inelastic interaction ---
      if (fDensity == 0.0)
         fDensity = material->GetDensity() / (CLHEP::g / CLHEP::cm3);
 
 
-   /* Partial inelastic intercation (KE> 0), i.e intercations that NOT stopthe proton, don't produce PG.
+   /* Partial inelastic intercation (KE> 0), i.e intercations that NOT stopped proton, don't produce PG.
      The filter KE> 0  is therefore physically justified. Stats of secondaries are printed at the end of simu*/
    
-      if ((fParticleType == "proton"  ||
-            fParticleType == "helium"  ||
-            fParticleType == "carbon") &&
+      if (fParticleType == "proton"  &&
+            step->GetPostStepPoint()->GetKineticEnergy() > 0.) return; 
+      
+            /*
+      if (fParticleType == "proton"  &&
             step->GetPostStepPoint()->GetKineticEnergy() > 0.) {
 
       // Count partial inelastic intercations per energy bin
@@ -386,7 +364,7 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
                fEnergiesSecondairesPartiel[name].push_back(ekin);
          }
       return;
-   }
+   }*/
 
 
       // ---Count total inelastic intrcations that stop the proton (KE=0) per energy bin ---
@@ -417,8 +395,9 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
      // ── Loop over secondaries to collect PG ──────────────────────────────────
      G4TrackVector *secondaries = (const_cast<G4Step *>(step))->GetfSecondary();
 
-      // ── Investigation secondaires KE = 0 pour hélium et carbone ─────────────
-             if (fParticleType == "helium" || fParticleType == "carbon") { 
+     /*
+      // ── Investigation secondaires KE = 0 proton et neutron─────────────
+             if (fParticleType == "proton" || fParticleType == "neutron") { 
                for (size_t i = 0; i < secondaries->size(); ++i) { 
                   G4String name = (*secondaries)[i]->GetDefinition()->GetParticleName(); 
                   G4double ekin = (*secondaries)[i]->GetKineticEnergy() / MeV; 
@@ -427,6 +406,7 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
                      fEnergiesSecondairesTotal[name].push_back(ekin);
                }
             }
+         */
 
      G4bool producedGamma = false;
 
@@ -436,13 +416,14 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
         // Energy filter : keep PG between 0.04 Mev and GammaMaxEnergy
         G4double Egamma = (*secondaries)[i]->GetKineticEnergy(); 
         if (Egamma < 0.04 * MeV || Egamma > fGammaMaxEnergy) continue; 
+        fNGammaDetectedMono +=1;
 
         G4double Epart_MeV = particle_energy / MeV;
         G4double Eg_MeV = Egamma / MeV;
 
         // Fill EpEpg and NrPG histogram
         analysisManager->FillH2(fH2EpEpgMono, Epart_MeV, Eg_MeV);
-        analysisManager->FillH1(fH1NrPGMono,  Epart_MeV, 1.0);
+        //analysisManager->FillH1(fH1NrPGMono,  Epart_MeV, 1.0);
         
          // Get bin gamma indices for GammaZ accumaluation
         G4int gBin = static_cast<G4int>(
@@ -455,7 +436,7 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
             pBin >= 0 && pBin < fParticleNbBins) {
             // accumulate kappa-inel  for GammaZ normalization
            fGammaZData[pBin][gBin] += cross_section;
-           fGammaEvents.push_back({Epart_MeV, Eg_MeV, cross_section, pBin});
+           //fGammaEvents.push_back({Epart_MeV, Eg_MeV, cross_section, pBin});
         }
         producedGamma = true;
      }
@@ -474,15 +455,23 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
   // ── Inelastic filter  ────────────────────────────────────────────────
   if (process != inelasticProcess) return;
 
+  // Mesure de temps de dynamic
+  auto t1 = std::chrono::high_resolution_clock::now();
+
   const G4HadronicProcess *hadProc =
       dynamic_cast<const G4HadronicProcess *>(inelasticProcess);
-  if (!hadProc) return;
+  if (!hadProc) return; 
+  auto t1b = std::chrono::high_resolution_clock::now();
 
   const G4Nucleus *targetNucleus = hadProc->GetTargetNucleus();
   if (!targetNucleus) return;
 
   G4int Z = targetNucleus->GetZ_asInt();
+  //G4double A = static_cast<G4double>(targetNucleus->GetA_asInt());
+  //G4cout << "Z=" << Z << "A=" << A << G4endl;
+
   if (fGammaZDataMap.find(Z) == fGammaZDataMap.end()) return;
+  auto t2 = std::chrono::high_resolution_clock::now();
 
   analysisManager->FillH1(fH1EpIndex[Z], particle_energy / MeV, 1.0);
 
@@ -495,11 +484,13 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
   if (pBinInelastic >= 0 && pBinInelastic < fParticleNbBins)
      fNInelasticMap[Z][pBinInelastic] += 1.0;
 
-
+    
+   
     
   G4double cross_section =
       store->GetCrossSectionPerVolume(particle, particle_energy,
                                       inelasticProcess, material);
+   auto t3 = std::chrono::high_resolution_clock::now();                                  
 
   if (!fSigmaFilledMap[Z]) {
      for (G4int f = 1; f <= fParticleNbBins; ++f) {
@@ -521,6 +512,7 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
 
      G4double Egamma = (*secondaries)[i]->GetKineticEnergy();
      if (Egamma < 0.04 * MeV || Egamma > fGammaMaxEnergy) continue;
+     fNGammaDetectedMap[Z] += 1;
 
      G4double Epart_MeV = particle_energy / MeV;
      G4double Eg_MeV = Egamma / MeV;
@@ -534,15 +526,19 @@ void GatePromptGammaStatisticActor::SteppingAction(G4Step *step) {
      if (pBin < 0 || pBin >= fParticleNbBins) continue;
 
      fGammaZDataMap[Z][pBin][gBin] += cross_section;
-     fGammaEventsMap[Z].push_back({Epart_MeV, Eg_MeV, cross_section, pBin});
 
-     //analysisManager->FillH2(fH2EpEpgNormalizedIndex[Z], Epart_MeV, Eg_MeV,
-      //                        cross_section);
+      fGammaZDataMap[Z][pBin][gBin] += cross_section;
+
      analysisManager->FillH2(fH2EpEpgIndex[Z], Epart_MeV, Eg_MeV);
-     analysisManager->FillH1(fH1NrPGIndex[Z],  Epart_MeV, 1.0);
 
      producedGamma = true;
   }
+  auto t4 = std::chrono::high_resolution_clock::now();
+  fTimeDynamicCast += std::chrono::duration<double>(t1b-t1).count(); 
+  fTimeTargetNucleus += std::chrono::duration<double>(t2-t1b).count(); 
+  fTimeCrossSection += std::chrono::duration<double>(t3-t2).count(); 
+  fTimeMapAccess += std::chrono::duration<double>(t4-t3).count(); 
+  
 
   if (producedGamma)
      fEpInelasticProducedGammaMap[Z].push_back(particle_energy / MeV);
@@ -564,23 +560,26 @@ int GatePromptGammaStatisticActor::EndOfRunActionMasterThread(int run_id) {
   // ════════════════════════════════════════════════════════════════════════
   if (!fMultiElement) {
 
-     // Normalisation fGammaZData
-     for (G4int i = 0; i < fParticleNbBins; ++i) {
-        G4double sf = fNInelastic[i] * fDensity;
-        if (sf > 0) {
-           for (G4int j = 0; j < fGammaNbBins; ++j)
-              fGammaZData[i][j] /= sf;
-        }
-     }
+    
 
-     // Remplir GammaZ
-     for (auto &[Ep, Eg, xs, pBinEvt] : fGammaEvents) {
-        G4double sf = fNInelastic[pBinEvt] * fDensity;
-        if (sf > 0)
-           analysisManager->FillH2(fH2GammaZMono, Ep, Eg, xs / sf);
-     }
+     for (G4int i = 0; i < fParticleNbBins; ++i) {
+   G4double sf = fNInelastic[i] * fDensity;
+   if (sf > 0) {
+      G4double Ep = fParticleMinEnergy/MeV + (i+0.5)*
+                    (fParticleMaxEnergy-fParticleMinEnergy)/MeV/fParticleNbBins;
+      for (G4int j = 0; j < fGammaNbBins; ++j) {
+         if (fGammaZData[i][j] > 0) {
+            G4double Eg = fGammaMinEnergy/MeV + (j+0.5)*
+                          (fGammaMaxEnergy-fGammaMinEnergy)/MeV/fGammaNbBins;
+            analysisManager->FillH2(fH2GammaZMono, Ep, Eg, fGammaZData[i][j] / sf);
+         }
+      }
+    }
+  }
 
     
+
+
      // EpInelastic depuis fNInelastic
      for (G4int i = 0; i < fParticleNbBins; ++i) {
         if (fNInelastic[i] > 0) {
@@ -594,14 +593,14 @@ int GatePromptGammaStatisticActor::EndOfRunActionMasterThread(int run_id) {
      for (auto &Ep : fEpInelasticProducedGamma)
         analysisManager->FillH1(fH1EpInelasticProducedGammaMono, Ep, 1.0);
 
-
+    std::cout << "Total PG détectés (mono) : " << fNGammaDetectedMono << std::endl;
     analysisManager->Write();
     analysisManager->CloseFile();
 
     analysisManager->Reset();
 
    
-
+     /*
       // ── Write KE > 0 secondaries to txt file ─────────────────────────────────
       if (fSaveKE0Secondaries && !fEnergiesSecondairesPartiel.empty()) {
          std::string txtFile = fOutputFilename + "_KE0_secondaries.txt";
@@ -623,10 +622,11 @@ int GatePromptGammaStatisticActor::EndOfRunActionMasterThread(int run_id) {
                outFile << name << " " << e << "\n";
       
          outFile.close();
-      }
+      }*/
 
       return 0;
    }
+      
   
 
   // ════════════════════════════════════════════════════════════════════════
@@ -635,19 +635,23 @@ int GatePromptGammaStatisticActor::EndOfRunActionMasterThread(int run_id) {
 
   for (auto &[Z, sym] : fZtoSymbol) {
 
-     for (G4int i = 0; i < fParticleNbBins; ++i) {
-        G4double sf = fNInelasticMap[Z][i] * fDensityMap[Z];
-        if (sf > 0) {
-           for (G4int j = 0; j < fGammaNbBins; ++j)
-              fGammaZDataMap[Z][i][j] /= sf;
-        }
-     }
 
-     for (auto &[Ep, Eg, xs, pBinEvt] : fGammaEventsMap[Z]) {
-        G4double sf = fNInelasticMap[Z][pBinEvt] * fDensityMap[Z];
-        if (sf > 0)
-           analysisManager->FillH2(fH2GammaZIndex[Z], Ep, Eg, xs / sf);
-     }
+   // -----Normalisation et remplissange bin par bin ---------------------
+   for (G4int i = 0; i < fParticleNbBins; ++i) {
+      G4double sf = fNInelasticMap[Z][i] * fDensityMap[Z];
+      if (sf > 0) {
+         G4double Ep = fParticleMinEnergy/MeV + (i+0.5)*
+                    (fParticleMaxEnergy-fParticleMinEnergy)/MeV/fParticleNbBins;
+         for (G4int j = 0; j < fGammaNbBins; ++j) {
+            if (fGammaZDataMap[Z][i][j] > 0) {
+               G4double Eg = fGammaMinEnergy/MeV + (j+0.5)*
+                          (fGammaMaxEnergy-fGammaMinEnergy)/MeV/fGammaNbBins;
+                  // divise par N_inel * densité et remplir l'histogramme
+            analysisManager->FillH2(fH2GammaZIndex[Z], Ep, Eg, fGammaZDataMap[Z][i][j] / sf);
+            }
+         }
+      }
+   }
 
 
      // EpInelastic par élément
@@ -665,6 +669,20 @@ int GatePromptGammaStatisticActor::EndOfRunActionMasterThread(int run_id) {
 
    
   }
+
+   G4cout << "Temps dynamic_cast    : " << fTimeDynamicCast   << " s" << G4endl;
+   G4cout << "Temps targetNucleus   : " << fTimeTargetNucleus << " s" << G4endl;
+   G4cout << "Temps CrossSection    : " << fTimeCrossSection  << " s" << G4endl;
+   G4cout << "Temps MapAccess       : " << fTimeMapAccess     << " s" << G4endl;
+   std::cout << "temps total SteppingAction : " << fTimeTotal << "s" << std::endl;
+
+
+  G4int total = 0;
+   for (auto &[Z, n] : fNGammaDetectedMap) {
+      std::cout << "Z=" << Z << " N_PG=" << n << std::endl;
+      total += n;
+   }
+   std::cout << "Total PG détectés (multi) : " << total << std::endl;
 
   analysisManager->Write();
   analysisManager->CloseFile();
