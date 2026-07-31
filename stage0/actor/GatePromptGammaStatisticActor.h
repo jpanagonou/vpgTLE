@@ -24,8 +24,6 @@
 #include <map>
 #include <string>
 
-#include "G4Alpha.hh"
-#include "G4IonTable.hh"
 
 
 namespace py = pybind11;
@@ -57,7 +55,7 @@ private:
   
 
 
-  // ── Paramètres de binning ─────────────────────────────────────────────────
+  //--- Parametres de binning-------------------------------
   G4int    fParticleNbBins;
   G4double fParticleMinEnergy;
   G4double fParticleMaxEnergy;
@@ -66,39 +64,39 @@ private:
   G4double fGammaMaxEnergy;
   
 
-  // ── Paramètres de sortie ──────────────────────────────────────────────────
+  // --- Paramètres de sortie ----------------------------------
   G4String    fOutputFilename;
   
   std::string fParticleType;
 
-  // ── Mode mono/multi ───────────────────────────────────────────────────────
+  //--- Mode mono/multi -----------------------
   G4bool fMultiElement;
   G4bool fSaveKE0Secondaries;
 
-  // ══════════════════════════════════════════════════════════════════════════
+  // -----------------------------------------------------
   // MODE MONO
-  // ══════════════════════════════════════════════════════════════════════════
+  // ----------------------------------------------------
 
   G4String fMaterialName;
   G4String fMonoSymbol;
+  G4int fNGammaDetectedMono = 0;
 
   // Flags internes
   G4bool   fSigmaFilled;
   G4double fDensity;
 
   // Shadow arrays
-  std::vector<std::vector<G4double>> fGammaZData;
-  std::vector<std::vector<G4double>> fEpEpgNormData;   
+  std::vector<std::vector<G4double>> fGammaZData;  
   std::vector<G4double>              fNInelastic;
-  std::vector<std::tuple<G4double, G4double, G4double, G4int>> fGammaEvents;
-  std::vector<std::tuple<G4double, G4double, G4double, G4int>> fEpEpgNormEvents; 
+
+
+  
+
   std::vector<G4double> fEpInelasticProducedGamma; 
 
   // Index des histogrammes mono
   G4int fH2EpEpgMono;
   G4int fH2GammaZMono;
-  //G4int fH2EpEpgNormalizedMono;    
-  G4int fH1NrPGMono;
   G4int fH1KapaMono;
   G4int fH1EpMono;                 
   G4int fH1EpInelasticMono;        
@@ -110,7 +108,7 @@ private:
   std::map<G4String, G4int> fSecondairePartielCount; 
   std::map<G4String, std::vector<G4double>> fEnergiesSecondairesPartiel;
 
-  // Lien avec helium et alpha debut
+  
   std::map<G4String, G4int> fSecondaireTotalCount; 
   std::map<G4String, std::vector<G4double>> fEnergiesSecondairesTotal;
   // Fin
@@ -119,31 +117,34 @@ private:
 
 
 
-  // ══════════════════════════════════════════════════════════════════════════
+  //--------------------------------------------------
   // MODE MULTI
-  // ══════════════════════════════════════════════════════════════════════════
+  // -------------------------------------------------
 
-  std::map<G4int, std::string> fZtoSymbol;
+double fTimeDynamicCast    = 0.0;
+double fTimeTargetNucleus  = 0.0;
+double fTimeCrossSection   = 0.0;
+double fTimeMapAccess      = 0.0;
+double fTimeTotal          = 0.0;
 
-  // Index des histogrammes par élément
-  std::map<G4int, G4int> fH2EpEpgIndex;
-  std::map<G4int, G4int> fH2GammaZIndex;
-  //std::map<G4int, G4int> fH2EpEpgNormalizedIndex;    
-  std::map<G4int, G4int> fH1NrPGIndex;
-  std::map<G4int, G4int> fH1KapaIndex;
-  std::map<G4int, G4int> fH1EpIndex;                 
-  std::map<G4int, G4int> fH1EpInelasticIndex;       
-  std::map<G4int, G4int> fH1EpInelasticProducedGammaIndex; 
 
-  // Données par élément
-  std::map<G4int, std::vector<std::vector<G4double>>> fGammaZDataMap;
-  std::map<G4int, std::vector<std::vector<G4double>>> fEpEpgNormDataMap;  
-  std::map<G4int, std::vector<G4double>>              fNInelasticMap;
-  std::map<G4int, G4double>                           fDensityMap;
-  std::map<G4int, G4bool>                             fSigmaFilledMap;
-  std::map<G4int, std::vector<std::tuple<G4double, G4double, G4double, G4int>>> fGammaEventsMap;
-  std::map<G4int, std::vector<std::tuple<G4double, G4double, G4double, G4int>>> fEpEpgNormEventsMap; 
-  std::map<G4int, std::vector<G4double>> fEpInelasticProducedGammaMap;  
+
+std::unordered_map<G4int, std::string> fZtoSymbol;
+std::unordered_map<G4int, G4int> fH2EpEpgIndex;
+std::unordered_map<G4int, G4int> fH2GammaZIndex;
+std::unordered_map<G4int, G4int> fH1KapaIndex;
+std::unordered_map<G4int, G4int> fH1EpIndex;
+std::unordered_map<G4int, G4int> fH1EpInelasticIndex;
+std::unordered_map<G4int, G4int> fH1EpInelasticProducedGammaIndex;
+std::unordered_map<G4int, std::vector<std::vector<G4double>>> fGammaZDataMap;
+std::unordered_map<G4int, std::vector<G4double>> fNInelasticMap;
+std::unordered_map<G4int, G4double> fDensityMap;
+std::unordered_map<G4int, G4bool> fSigmaFilledMap;
+std::unordered_map<G4int, std::vector<G4double>> fEpInelasticProducedGammaMap;
+std::unordered_map<G4int, G4int> fNGammaDetectedMap; 
+
+
+
 
 };
 
