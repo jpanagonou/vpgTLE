@@ -14,9 +14,9 @@ mm  = gate.g4_units.mm
 t0 = time.time()
 
 
-# ── Paramètres ────────────────────────────────────────────────────────────────
+# ── Parametres ────────────────────────────────────────────────────────────────
 particle_type = "proton"  # "proton", "neutron"
-material_name = "AllElements" # Oxygen
+material_name = "AllElements" # AllElements or Oxygen or Carbon etc
 data_dir   = Path(__file__).parent.parent / "data"
 output_dir = Path(__file__).parent.parent / "output"
 output_dir.mkdir(exist_ok=True)
@@ -52,7 +52,7 @@ sim.physics_manager.set_user_limits_particles(["all"])
 
 # ── Source ────────────────────────────────────────────────────────────────────
 source                      = sim.add_source("GenericSource", "source")
-source.particle             = "proton"  # proton, neutron
+source.particle             = particle_type  # proton, neutron
 source.energy.mono          = 200* MeV
 source.n                    = 1e5
 source.direction.type       = "momentum"
@@ -80,21 +80,18 @@ actor.save_KE0_secondaries = False
 # ── Lancement ─────────────────────────────────────────────────────────────────
 sim.run()
 
+t1 = time.time()
 
+print(f"Temps de simulation : {t1 - t0:.2f}s")
 
 
 # ── Post-traitement ───────────────────────────────────────────────────────────
 root_file = str(output_dir / f"PGdb_{material_name}_{particle_type}.root")
 reorganize_root_file(root_file)
 
-t1 = time.time()
-print(f"Temps de simulation : {t1 - t0:.2f}s")
-
 if actor.save_KE0_secondaries:
     convert_secondaries_to_root(output_dir, material_name, particle_type)
 
 
 print(f"Simulation terminée — PGdb_{material_name}_{particle_type}.root")
-
-
 
